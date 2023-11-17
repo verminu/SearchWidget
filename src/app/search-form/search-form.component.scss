@@ -1,0 +1,52 @@
+@use "styles/mixins";
+
+:host {
+  width: 26rem;
+  display: block;
+}
+
+.search-input-container {
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.facet-layout {
+  display: grid;
+  grid-template-columns: minmax(auto, 6rem) 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.facet-container {
+  display: contents; /* Makes the container transparent, allowing its children to be part of the grid */
+}
+
+.facet-label {
+  white-space: nowrap; /* Prevents text wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds ellipsis for overflowed text */
+
+  .facet-container--checkboxes & {
+    line-height: var(--mdc-checkbox-state-layer-size);
+    align-self: start;
+  }
+}
+
+.facet-content {
+
+}
+
+
+mat-radio-group {
+  display: flex;
+
+  mat-radio-button {
+    flex: 1; /* Each container takes equal space */
+  }
+}
+
+.checkboxes-container {
+  @include mixins.custom-scrollbar();
+  max-height: 10rem;
+}

@@ -1,38 +1,21 @@
 /**
  * Define the interfaces for the facets configuration
  */
+export enum FacetType {
+  YesNo = 'yesno',
+  Multiselect = 'multiselect',
+  Checkboxes = 'checkboxes',
+}
 
-type BaseFacetConfig = {
-  type: string; // specify the type of the widget to be displayed
+export type FacetConfig = {
+  type: FacetType; // specify the type of the widget to be displayed
   label: string; // the label of the widget
-  key: string // each widget has a unique key, so it can be identified
-}
-
-type YesNoFacetConfig = BaseFacetConfig & {
-  type: 'yesNo';
-}
-
-type MultiselectFacetConfig = BaseFacetConfig & {
-  type: 'multiselect';
-  data: {
+  key: string; // each widget has a unique key, so it can be identified
+  data?: { // additional data needed for displaying a facet
     key: string | number;
     label: string;
   }[]
 }
-
-type CheckboxesFacetConfig = BaseFacetConfig & {
-  type: 'checkboxes';
-  data: {
-    key: string | number;
-    label: string;
-  }[]
-}
-
-// used to describe the data type of the search form's facets configuration
-export type FacetConfig =
-  YesNoFacetConfig |
-  MultiselectFacetConfig |
-  CheckboxesFacetConfig
 
 export type FacetsConfig = FacetConfig[]
 
@@ -41,7 +24,7 @@ export type FacetsConfig = FacetConfig[]
  */
 
 // true = yes, false = no, null = irrelevant
-type YesNoSelection = boolean | null;
+type YesNoSelection = true | false | null;
 
 type MultiselectSelection = {
   key: string | number;

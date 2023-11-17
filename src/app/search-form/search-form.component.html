@@ -1,0 +1,65 @@
+<form [formGroup]="searchForm" (ngSubmit)="handleSearch()">
+
+  <div class="search-input-container">
+    <mat-form-field appearance="fill">
+      <mat-label>Search</mat-label>
+      <input matInput formControlName="searchTerm">
+      <button mat-icon-button
+              matSuffix
+              *ngIf="searchForm.get('searchTerm')!.value"
+              (click)="searchForm.get('searchTerm')!.setValue('')">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+
+  <div formGroupName="selections" class="facet-layout">
+
+    <div *ngFor="let facet of facetsConfig" [className]="'facet-container facet-container--'+facet.type">
+
+      <div class="facet-label">
+        <label>{{ facet.label }}</label>
+      </div>
+
+      <div class="facet-content">
+        <ng-container [ngSwitch]="facet.type">
+
+          <ng-container *ngSwitchCase="FacetType.YesNo">
+            <div class="">
+              <mat-radio-group [formControlName]="facet.key" class="radio-group-container">
+                <mat-radio-button [value]="true">Yes</mat-radio-button>
+                <mat-radio-button [value]="false">No</mat-radio-button>
+                <mat-radio-button [value]="null">Irrelevant</mat-radio-button>
+              </mat-radio-group>
+            </div>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="FacetType.Multiselect">
+            <div>
+              <mat-form-field subscriptSizing="dynamic">
+                <mat-label>Select</mat-label>
+                <mat-select [formControlName]="facet.key" multiple>
+                  <mat-option *ngFor="let option of facet.data" [value]="option.key">{{option.label}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="FacetType.Checkboxes">
+            <div [formArrayName]="facet.key" class="checkboxes-container">
+              <div class="w-100" *ngFor="let option of facet.data; let i = index;">
+                <mat-checkbox [formControlName]="i">{{option.label}}</mat-checkbox>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end mt-4">
+    <button mat-button mat-raised-button color="primary" type="submit">Search</button>
+  </div>
+</form>
+
