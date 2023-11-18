@@ -94,7 +94,8 @@ export class AppComponent {
           ['uiux', 'UI/UX Design'],
           ['e-commerce', 'E-commerce'],
       ]),
-    },  ];
+    },
+  ];
 
   search(filters: FilterModel) {
     console.log(filters);
