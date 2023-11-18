@@ -11,10 +11,7 @@ export type FacetConfig = {
   type: FacetType; // specify the type of the widget to be displayed
   label: string; // the label of the widget
   key: string; // each widget has a unique key, so it can be identified
-  data?: { // additional data needed for displaying a facet
-    key: string | number;
-    label: string;
-  }[]
+  data?: Map<string|number, string> // additional data needed for displaying a facet
 }
 
 export type FacetsConfig = FacetConfig[]
@@ -24,29 +21,20 @@ export type FacetsConfig = FacetConfig[]
  */
 
 // true = yes, false = no, null = irrelevant
-type YesNoSelection = true | false | null;
+export type YesNoSelection = true | false | null;
 
-type MultiselectSelection = {
-  key: string | number;
-  label?: string;
-}[]
+export type ListSelection = [string|number, string][];
 
-type CheckboxesSelection = {
-  key: string | number;
-  label?: string;
-}[]
-
-type FacetSelection =
+export type FacetSelection =
   YesNoSelection |
-  MultiselectSelection |
-  CheckboxesSelection
+  ListSelection
 
 // defines the type of the data emitted by the search event
 export type FilterModel = {
   // search query
-  searchTerm: string;
+  searchTerm?: string;
   // selections for each facet
-  selections: {
+  selections?: {
     [facetKey: string]: FacetSelection
   }
 }
