@@ -14,18 +14,20 @@ import {
   FacetType,
   FilterModel, ListSelection,
 } from "./search-form.model";
-import {AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn} from "@angular/forms";
+import {FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {MatRadioModule} from "@angular/material/radio";
 import {MatSelectModule} from "@angular/material/select";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
+import {FormService} from "./form.service";
 
 @Component({
   selector: 'app-search-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatRadioModule, MatSelectModule, MatCheckboxModule, MatInputModule, MatButtonModule, MatIconModule],
+  providers: [FormService],
   templateUrl: './search-form.component.html',
   styleUrl: './search-form.component.scss'
 })
@@ -40,7 +42,7 @@ export class SearchFormComponent implements OnInit {
   @Output() search = new EventEmitter<FilterModel>();
 
   // stores all validated facet configurations
-  facetsConfig: FacetConfig[] = []
+  facetConfig: FacetConfig[] = []
 
   // the main form group
   searchForm!: FormGroup;
@@ -49,8 +51,6 @@ export class SearchFormComponent implements OnInit {
 
   FacetType = FacetType;
 
-  // stores the facets keys for checking their uniqueness
-  private facetKeys: string[] = [];
   private facetMappings = new Map<FacetType, Function>([
     [FacetType.Checkboxes, this.mapCheckboxesValue],
     [FacetType.Multiselect, this.mapMultiselectValue],
@@ -58,26 +58,20 @@ export class SearchFormComponent implements OnInit {
 
   searchTerm: string = '';
 
-  constructor(private formBuilder: FormBuilder) {
-  }
+  constructor(
+    private formService: FormService
+  ) {}
 
   ngOnInit() {
-    // validate search inputs
-    this.validateSearchLengths();
+    // validate search length inputs
+    this.validateSearchLengthInputs();
 
-    // the main form group
-    this.searchForm = this.formBuilder.group({
-      // represents the search input field
-      searchTerm: ['', {
-        validators: searchValidator(this.minSearchLength, this.maxSearchLength),
-        updateOn: 'submit'
-      }],
-      // group the facets under a separate key
-      selections: this.formBuilder.group({})
-    });
+    this.searchForm = this.formService.createSearchForm(this.facets, {
+      minSearchLength: this.minSearchLength,
+      maxSearchLength: this.maxSearchLength,
+    })
 
-    // dynamically create the form controls based on the provided input
-    this.addSelectionFacetControls();
+    this.facetConfig = this.formService.getFacetConfig();
   }
 
   /**
@@ -103,7 +97,7 @@ export class SearchFormComponent implements OnInit {
     });
   }
 
-  private validateSearchLengths() {
+  private validateSearchLengthInputs() {
     if (this.minSearchLength <= 0 || this.minSearchLength > this.MAX_SEARCH_LENGTH_LIMIT ||
       this.maxSearchLength <= 0 || this.maxSearchLength > this.MAX_SEARCH_LENGTH_LIMIT ||
       this.maxSearchLength <= this.minSearchLength) {
@@ -133,76 +127,7 @@ export class SearchFormComponent implements OnInit {
   /**
    * Create the widgets based on the provided configuration from the `facets` input property
    */
-  private addSelectionFacetControls() {
-    this.facets.forEach((facet) => {
 
-      // check if the facet type has been used before
-      if (this.isFacetKeyUnique(facet.key)) {
-
-        // validate the facet config
-        let configValidation = this.validateFacetConfig(facet);
-
-        if (configValidation === true) {
-          // create a new form control and add it to the main form group
-          this.addFacetFormControl(facet);
-          this.addFacetConfig(facet);
-        } else {
-          console.error(configValidation, facet);
-          return;
-        }
-      } else {
-        console.error(`Duplicate facet key ${facet.key}`, facet);
-        return;
-      }
-    })
-  }
-
-  private addFacetFormControl(facet: FacetConfig) {
-    let control: AbstractControl;
-
-    // create a FormArray control if the facet contains checkboxes
-    if (facet.type === FacetType.Checkboxes && facet.data) {
-      control = this.formBuilder.array(
-        Array.from(facet.data.keys())
-          .map(() => this.formBuilder.control(false))
-      );
-    }
-    // create a normal control
-    else {
-      control = this.formBuilder.control(null);
-    }
-
-    // add the control into the `selections` subgroup
-    (this.searchForm.get('selections') as FormGroup).addControl(facet.key, control);
-
-    // store the facet key
-    this.facetKeys.push(facet.key.toLowerCase());
-  }
-
-  private isFacetKeyUnique(facetKey: string) {
-    return !this.facetKeys.includes(facetKey.toLowerCase());
-  }
-
-  private validateFacetConfig(facet: FacetConfig): true | string {
-    switch (facet.type) {
-      case FacetType.Checkboxes:
-      case FacetType.Multiselect:
-        // validate if the `data` property contains any values
-        if (!facet.data?.size) {
-          return "The facet config's 'data' property doesn't contain any values"
-        }
-        break;
-    }
-
-    return true;
-  }
-
-  /**
-   * Store a valid facet configuration
-   */
-  private addFacetConfig(facet: FacetConfig) {
-    this.facetsConfig.push(facet);
-  }
 
   private mapRawValues(formValue: any): FilterModel {
     const filters: FilterModel = {}
@@ -290,10 +215,3 @@ export class SearchFormComponent implements OnInit {
   }
 }
 
-function searchValidator(minLength: number, maxLength: number): ValidatorFn {
-  return (control: AbstractControl): { [key: string]: any } | null => {
-    const input = control.value.trim();
-    const isValid = input === '' || (input.length >= minLength && input.length <= maxLength);
-    return isValid ? null : { 'searchInvalid': true };
-  };
-}
