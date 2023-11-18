@@ -95,6 +95,10 @@ export class SearchFormComponent implements OnInit {
     });
   }
 
+  preserveMapOrderComparator() {
+    return 0;
+  }
+
   private buildInitialSelections(): Record<string, any> {
     const selectionsGroup: Record<string, any> = {};
 
