@@ -21,7 +21,7 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
-import {FormService} from "./form.service";
+import {FormOptions, FormService} from "./form.service";
 
 @Component({
   selector: 'app-search-form',
@@ -32,13 +32,10 @@ import {FormService} from "./form.service";
   styleUrl: './search-form.component.scss'
 })
 export class SearchFormComponent implements OnInit {
-  private readonly MAX_SEARCH_LENGTH_LIMIT = 50;
-  private readonly MIN_SEARCH_LENGTH = 3;
-  private readonly MAX_SEARCH_LENGTH = 20;
 
   @Input() facets: FacetConfig[] = [];
-  @Input() minSearchLength = this.MIN_SEARCH_LENGTH;
-  @Input() maxSearchLength = this.MAX_SEARCH_LENGTH;
+  @Input() minSearchLength?: number;
+  @Input() maxSearchLength?: number;
   @Output() search = new EventEmitter<FilterModel>();
 
   // stores all validated facet configurations
@@ -57,21 +54,22 @@ export class SearchFormComponent implements OnInit {
   ])
 
   searchTerm: string = '';
+  minSearchLengthOption!: number;
+  maxSearchLengthOption!: number;
 
   constructor(
     private formService: FormService
   ) {}
 
   ngOnInit() {
-    // validate search length inputs
-    this.validateSearchLengthInputs();
-
     this.searchForm = this.formService.createSearchForm(this.facets, {
       minSearchLength: this.minSearchLength,
       maxSearchLength: this.maxSearchLength,
     })
 
     this.facetConfig = this.formService.getFacetConfig();
+
+    this.extractSanitizedOptions(this.formService.getOptions());
   }
 
   /**
@@ -95,18 +93,6 @@ export class SearchFormComponent implements OnInit {
       searchTerm: '', // Reset searchTerm to empty string
       selections: this.buildInitialSelections() // Reset selections to initial state
     });
-  }
-
-  private validateSearchLengthInputs() {
-    if (this.minSearchLength <= 0 || this.minSearchLength > this.MAX_SEARCH_LENGTH_LIMIT ||
-      this.maxSearchLength <= 0 || this.maxSearchLength > this.MAX_SEARCH_LENGTH_LIMIT ||
-      this.maxSearchLength <= this.minSearchLength) {
-
-      console.error(`Invalid search lengths. Reverting to default values.`);
-
-      this.minSearchLength = this.MIN_SEARCH_LENGTH;
-      this.maxSearchLength = this.MAX_SEARCH_LENGTH;
-    }
   }
 
   private buildInitialSelections(): Record<string, any> {
@@ -212,6 +198,11 @@ export class SearchFormComponent implements OnInit {
 
   updateSearchTerm(event: Event) {
     this.searchTerm = (event.target as HTMLInputElement).value;
+  }
+
+  private extractSanitizedOptions(options: FormOptions) {
+    this.minSearchLengthOption = options.minSearchLength!;
+    this.maxSearchLengthOption = options.maxSearchLength!;
   }
 }
 

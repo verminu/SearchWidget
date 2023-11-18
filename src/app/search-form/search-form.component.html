@@ -8,9 +8,9 @@
 
         <input #errorField matInput formControlName="searchTerm" (input)="updateSearchTerm($event)">
 
-        <mat-hint align="start">Enter {{minSearchLength}} to {{maxSearchLength}} characters</mat-hint>
+        <mat-hint align="start">Enter {{minSearchLengthOption}} to {{maxSearchLengthOption}} characters</mat-hint>
         <mat-error *ngIf="searchForm.get('searchTerm')!.hasError('searchInvalid')">
-          Search term must be between {{minSearchLength}} and {{maxSearchLength}} characters
+          Search term must be between {{minSearchLengthOption}} and {{maxSearchLengthOption}} characters
         </mat-error>
 
         <button mat-icon-button

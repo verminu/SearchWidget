@@ -1,113 +1,166 @@
-import { Injectable } from '@angular/core';
-import {AbstractControl, FormBuilder, FormGroup, ValidatorFn} from "@angular/forms";
-import {FacetConfig, FacetType} from "./search-form.model";
+import {Injectable} from '@angular/core';
+import {FormBuilder, FormGroup, ValidatorFn, AbstractControl} from '@angular/forms';
+import {FacetConfig, FacetType} from './search-form.model';
+
+interface FacetHandler {
+  createControl(facet: FacetConfig, formBuilder: FormBuilder): AbstractControl;
+
+  validateFacetConfig(facet: FacetConfig): true | string;
+}
+
+export type FormOptions = {
+  minSearchLength?: number,
+  maxSearchLength?: number
+}
 
 @Injectable()
 export class FormService {
-  // stores the facets keys for checking their uniqueness
-  private facetKeys: string[] = [];
+  private readonly MAX_SEARCH_LENGTH_LIMIT = 50;
+  private readonly MIN_SEARCH_LENGTH = 3;
+  private readonly MAX_SEARCH_LENGTH = 20;
 
-  // stores all validated facet configurations
+  private facetHandlerRegistry: Map<FacetType, FacetHandler> = new Map();
+  private facetKeys: Set<string> = new Set();
   private facetConfig: FacetConfig[] = [];
+  private options: FormOptions = {};
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder) {
+    this.registerFacetHandlers();
+  }
 
-  // Method to create the search form
-  createSearchForm(facets: FacetConfig[], options: {minSearchLength: number, maxSearchLength: number}): FormGroup {
+  createSearchForm(facets: FacetConfig[], options: FormOptions): FormGroup {
+    // Validate and set search length defaults
+    const {minSearchLength, maxSearchLength} = this.validateAndSetSearchLengths(options);
+
     let form = this.formBuilder.group({
       searchTerm: ['', {
-        validators: this.searchValidator(options.minSearchLength, options.maxSearchLength),
+        validators: this.searchValidator(minSearchLength, maxSearchLength),
         updateOn: 'submit'
       }],
       selections: this.formBuilder.group({})
     });
 
-    this.addSelectionFacetControls(form, facets);
+    this.addFacetControls(form, facets);
+
+    this.options = {minSearchLength, maxSearchLength};
 
     return form;
   }
 
-  getFacetConfig() {
-    return this.facetConfig;
+  getFacetConfig(): FacetConfig[] {
+    return [...this.facetConfig];
   }
 
-  private isFacetKeyUnique(facetKey: string) {
-    return !this.facetKeys.includes(facetKey.toLowerCase());
+  getOptions(): FormOptions {
+    return {...this.options};
   }
 
-  private addSelectionFacetControls(form: FormGroup, facets: FacetConfig[]) {
-    facets.forEach((facet) => {
+  private registerFacetHandlers() {
+    this.facetHandlerRegistry.set(FacetType.Checkboxes, new CheckboxFacetHandler());
+    this.facetHandlerRegistry.set(FacetType.Multiselect, new MultiselectFacetHandler());
+    this.facetHandlerRegistry.set(FacetType.YesNo, new YesNoFacetHandler());
+  }
 
-      // check if the facet type has been used before
-      if (this.isFacetKeyUnique(facet.key)) {
+  private validateAndSetSearchLengths(options: { minSearchLength?: number, maxSearchLength?: number }): {
+    minSearchLength: number,
+    maxSearchLength: number
+  } {
+    let minSearchLength = options.minSearchLength ?? this.MIN_SEARCH_LENGTH;
+    let maxSearchLength = options.maxSearchLength ?? this.MAX_SEARCH_LENGTH;
 
-        // validate the facet config
-        let configValidation = this.validateFacetConfig(facet);
+    minSearchLength = this.ensureWithinRange(minSearchLength, 0, this.MAX_SEARCH_LENGTH_LIMIT, this.MIN_SEARCH_LENGTH);
+    maxSearchLength = this.ensureWithinRange(maxSearchLength, 0, this.MAX_SEARCH_LENGTH_LIMIT, this.MAX_SEARCH_LENGTH);
 
-        if (configValidation === true) {
-          // create a new form control and add it to the main form group
-          this.addFacetFormControl(facet, form);
-          this.addFacetConfig(facet);
-        } else {
-          console.error(configValidation, facet);
-          return;
-        }
-      } else {
-        console.error(`Duplicate facet key ${facet.key}`, facet);
+    if (maxSearchLength < minSearchLength) {
+      console.warn(`Max search length is less than min search length. Adjusting to default values.`);
+
+      minSearchLength = this.MIN_SEARCH_LENGTH;
+      maxSearchLength = this.MAX_SEARCH_LENGTH;
+    }
+
+    return {minSearchLength, maxSearchLength};
+  }
+
+  private ensureWithinRange(value: number, min: number, max: number, defaultValue: number): number {
+    return (value >= min && value <= max) ? value : defaultValue;
+  }
+
+  private addFacetControls(form: FormGroup, facets: FacetConfig[]): void {
+    facets.forEach(facet => {
+      if (!this.isFacetKeyUnique(facet.key)) {
+        console.error(`Duplicate facet key ${facet.key}`);
         return;
       }
-    })
+
+      const handler = this.facetHandlerRegistry.get(facet.type);
+      if (!handler) {
+        console.error(`Handler not found for facet type: ${facet.type}`);
+        return;
+      }
+
+      const facetConfigValidation = handler.validateFacetConfig(facet);
+      if (facetConfigValidation !== true) {
+        console.error(facetConfigValidation);
+        return;
+      }
+
+      const control = handler.createControl(facet, this.formBuilder);
+      (form.get('selections') as FormGroup).addControl(facet.key, control);
+
+      this.facetConfig.push(facet);
+      this.facetKeys.add(facet.key.toLowerCase());
+    });
   }
 
-
-  private addFacetFormControl(facet: FacetConfig, form: FormGroup) {
-    let control: AbstractControl;
-
-    // create a FormArray control if the facet contains checkboxes
-    if (facet.type === FacetType.Checkboxes && facet.data) {
-      control = this.formBuilder.array(
-        Array.from(facet.data.keys())
-          .map(() => this.formBuilder.control(false))
-      );
-    }
-    // create a normal control
-    else {
-      control = this.formBuilder.control(null);
-    }
-
-    // add the control into the `selections` subgroup
-    (form.get('selections') as FormGroup).addControl(facet.key, control);
-
-    // store the facet key
-    this.facetKeys.push(facet.key.toLowerCase());
-  }
-
-  private validateFacetConfig(facet: FacetConfig): true | string {
-    switch (facet.type) {
-      case FacetType.Checkboxes:
-      case FacetType.Multiselect:
-        // validate if the `data` property contains any values
-        if (!facet.data?.size) {
-          return "The facet config's 'data' property doesn't contain any values"
-        }
-        break;
-    }
-
-    return true;
-  }
-
-  /**
-   * Store a valid facet configuration
-   */
-  private addFacetConfig(facet: FacetConfig) {
-    this.facetConfig.push(facet);
+  private isFacetKeyUnique(facetKey: string): boolean {
+    return !this.facetKeys.has(facetKey.toLowerCase());
   }
 
   private searchValidator(minLength: number, maxLength: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const input = control.value.trim();
       const isValid = input === '' || (input.length >= minLength && input.length <= maxLength);
-      return isValid ? null : { 'searchInvalid': true };
+      return isValid ? null : {'searchInvalid': true};
     };
+  }
+}
+
+class CheckboxFacetHandler implements FacetHandler {
+  createControl(facet: FacetConfig, formBuilder: FormBuilder): AbstractControl {
+    return formBuilder.array(
+      Array.from(facet.data!.keys()).map(() => formBuilder.control(false))
+    );
+  }
+
+  validateFacetConfig(facet: FacetConfig): true | string {
+    if (!facet.data?.size) {
+      return `Checkbox facet '${facet.key}' requires a non-empty 'data' property`;
+    }
+
+    return true;
+  }
+}
+
+class MultiselectFacetHandler implements FacetHandler {
+  createControl(facet: FacetConfig, formBuilder: FormBuilder): AbstractControl {
+    return formBuilder.control(null);
+  }
+
+  validateFacetConfig(facet: FacetConfig): true | string {
+    if (!facet.data?.size) {
+      return `Multiselect facet '${facet.key}' requires a non-empty 'data' property`;
+    }
+
+    return true;
+  }
+}
+
+class YesNoFacetHandler implements FacetHandler {
+  createControl(facet: FacetConfig, formBuilder: FormBuilder): AbstractControl {
+    return formBuilder.control(null);
+  }
+
+  validateFacetConfig(facet: FacetConfig): true | string {
+    return true;
   }
 }
