@@ -226,7 +226,7 @@ export class SearchFormComponent implements OnInit {
         const selections =
             Array.from(facetConfig.data.entries())
                 .filter(([], index) => checkboxValues[index])
-                .map(([key, label]): [string | number, string] => ([key, label]));
+                .map(([key, label]): [string, string] => ([key, label]));
 
         return selections.length ? selections : undefined;
     }

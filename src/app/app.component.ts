@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterOutlet} from '@angular/router';
 import {SearchFormComponent} from "./search-form/search-form.component";
@@ -11,7 +11,7 @@ import {FacetsConfig, FacetType, FilterModel} from "./search-form/search-form.mo
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'SearchComponent';
 
   searchConfig: FacetsConfig = [
@@ -96,6 +96,10 @@ export class AppComponent {
       ]),
     },
   ];
+
+  ngOnInit() {
+
+  }
 
   search(filters: FilterModel) {
     console.log(filters);

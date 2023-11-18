@@ -5,7 +5,8 @@
   display: block;
 }
 
-.search-input-container {
+.form-field--input,
+.form-field--select {
   mat-form-field {
     width: 100%;
   }
@@ -13,7 +14,7 @@
 
 .facet-layout {
   display: grid;
-  grid-template-columns: minmax(auto, 6rem) 1fr;
+  grid-template-columns: minmax(auto, 5rem) 1fr;
   gap: 1rem;
   align-items: center;
 }
@@ -46,7 +47,13 @@ mat-radio-group {
   }
 }
 
-.checkboxes-container {
+.form-field--checkboxes {
   @include mixins.custom-scrollbar();
   max-height: 10rem;
+}
+
+.scrollable-container {
+  @include mixins.custom-scrollbar();
+  max-height: 24rem;
+  padding: 0.5rem;
 }

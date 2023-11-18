@@ -1,61 +1,67 @@
 <form [formGroup]="searchForm" (ngSubmit)="handleSearch()">
 
-  <div class="search-input-container">
-    <mat-form-field appearance="fill">
-      <mat-label>Search</mat-label>
-      <input matInput formControlName="searchTerm" (keydown.enter)="$event.preventDefault(); handleSearch()">
-      <button mat-icon-button
-              matSuffix
-              *ngIf="searchForm.get('searchTerm')!.value"
-              (click)="searchForm.get('searchTerm')!.setValue('')">
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>
-  </div>
+  <div class="scrollable-container">
 
-  <div formGroupName="selections" class="facet-layout">
+    <div class="form-field--input">
+      <mat-form-field appearance="fill">
+        <mat-label>Search</mat-label>
+        <input matInput formControlName="searchTerm" (keydown.enter)="$event.preventDefault(); handleSearch()">
+        <button mat-icon-button
+                matSuffix
+                *ngIf="searchForm.get('searchTerm')!.value"
+                (click)="searchForm.get('searchTerm')!.setValue('')">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
 
-    <div *ngFor="let facet of facetsConfig" [className]="'facet-container facet-container--'+facet.type">
+    <div formGroupName="selections" class="facet-layout">
 
-      <div class="facet-label">
-        <label>{{ facet.label }}</label>
-      </div>
+      <div *ngFor="let facet of facetsConfig" [className]="'facet-container facet-container--'+facet.type">
 
-      <div class="facet-content">
-        <ng-container [ngSwitch]="facet.type">
+        <div class="facet-label">
+          <label>{{ facet.label }}</label>
+        </div>
 
-          <ng-container *ngSwitchCase="FacetType.YesNo">
-            <div class="">
-              <mat-radio-group [formControlName]="facet.key" class="radio-group-container">
-                <mat-radio-button [value]="true">Yes</mat-radio-button>
-                <mat-radio-button [value]="false">No</mat-radio-button>
-                <mat-radio-button [value]="null">Irrelevant</mat-radio-button>
-              </mat-radio-group>
-            </div>
-          </ng-container>
+        <div class="facet-content">
+          <ng-container [ngSwitch]="facet.type">
 
-          <ng-container *ngSwitchCase="FacetType.Multiselect">
-            <div>
-              <mat-form-field subscriptSizing="dynamic">
-                <mat-label>Select</mat-label>
-                <mat-select [formControlName]="facet.key" multiple>
-                  <mat-option *ngFor="let option of (facet.data ? (facet.data | keyvalue) : [])" [value]="[option.key, option.value]">{{option.value}}</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </ng-container>
-
-          <ng-container *ngSwitchCase="FacetType.Checkboxes">
-            <div [formArrayName]="facet.key" class="checkboxes-container">
-              <div class="w-100" *ngFor="let option of (facet.data ? (facet.data | keyvalue) : []); let i = index;">
-                <mat-checkbox [formControlName]="i">{{option.value}}</mat-checkbox>
+            <ng-container *ngSwitchCase="FacetType.YesNo">
+              <div class="form-field--radio">
+                <mat-radio-group [formControlName]="facet.key" class="radio-group-container">
+                  <mat-radio-button [value]="true">Yes</mat-radio-button>
+                  <mat-radio-button [value]="false">No</mat-radio-button>
+                  <mat-radio-button [value]="null">Irrelevant</mat-radio-button>
+                </mat-radio-group>
               </div>
-            </div>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="FacetType.Multiselect">
+              <div class="form-field--select">
+                <mat-form-field subscriptSizing="dynamic">
+                  <mat-label>Select</mat-label>
+                  <mat-select [formControlName]="facet.key" multiple>
+                    <mat-option *ngFor="let option of (facet.data ? (facet.data | keyvalue) : [])"
+                                [value]="[option.key, option.value]">{{option.value}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="FacetType.Checkboxes">
+              <div [formArrayName]="facet.key" class="form-field--checkboxes">
+                <div class="w-100" *ngFor="let option of (facet.data ? (facet.data | keyvalue) : []); let i = index;">
+                  <mat-checkbox [formControlName]="i">{{option.value}}</mat-checkbox>
+                </div>
+              </div>
+            </ng-container>
           </ng-container>
-        </ng-container>
+        </div>
+
       </div>
 
     </div>
+
   </div>
 
   <div class="d-flex justify-content-end mt-4">
