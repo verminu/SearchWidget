@@ -5,10 +5,18 @@
     <div class="form-field--input">
       <mat-form-field appearance="fill">
         <mat-label>Search</mat-label>
-        <input matInput formControlName="searchTerm" (keydown.enter)="$event.preventDefault(); handleSearch()">
+
+        <input #errorField matInput formControlName="searchTerm" (input)="updateSearchTerm($event)">
+
+        <mat-hint align="start">Enter {{minSearchLength}} to {{maxSearchLength}} characters</mat-hint>
+        <mat-error *ngIf="searchForm.get('searchTerm')!.hasError('searchInvalid')">
+          Search term must be between {{minSearchLength}} and {{maxSearchLength}} characters
+        </mat-error>
+
         <button mat-icon-button
                 matSuffix
-                *ngIf="searchForm.get('searchTerm')!.value"
+                type="button"
+                *ngIf="searchTerm.trim()"
                 (click)="searchForm.get('searchTerm')!.setValue('')">
           <mat-icon>close</mat-icon>
         </button>
@@ -68,5 +76,9 @@
     <button mat-button class="me-3" type="button" (click)="resetForm()">Reset</button>
     <button mat-button mat-raised-button color="primary" type="submit">Search</button>
   </div>
+
+  <mat-error *ngIf="searchForm.invalid" class="error-message">
+    Please correct the errors before searching.
+  </mat-error>
 </form>
 

@@ -1,2 +1,6 @@
 
-<app-search-form [facets]="searchConfig" (search)="search($event)"></app-search-form>
+<app-search-form [facets]="searchConfig"
+                 (search)="search($event)"
+                 [minSearchLength]="2"
+                 [maxSearchLength]="16"
+></app-search-form>
