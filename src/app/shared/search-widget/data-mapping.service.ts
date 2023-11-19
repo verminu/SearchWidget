@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {FacetConfig, FacetSelection, FacetType, FilterModel, ListSelection, YesNoSelection} from "./search-form.model";
+import {FacetConfig, FacetSelection, FacetType, FilterModel, ListSelection, YesNoSelection} from "./search-widget.model";
 
 interface FacetMappingStrategy {
   mapValue(facetValue: any, facetConfig: FacetConfig): FacetSelection | undefined;

@@ -12,7 +12,7 @@ import {
   FacetConfig,
   FacetType,
   FilterModel,
-} from "./search-form.model";
+} from "./search-widget.model";
 import {FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {MatRadioModule} from "@angular/material/radio";
 import {MatSelectModule} from "@angular/material/select";
@@ -24,14 +24,14 @@ import {FormOptions, FormService} from "./form.service";
 import {DataMappingService} from "./data-mapping.service";
 
 @Component({
-  selector: 'app-search-form',
+  selector: 'app-search-widget',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatRadioModule, MatSelectModule, MatCheckboxModule, MatInputModule, MatButtonModule, MatIconModule],
   providers: [FormService, DataMappingService],
-  templateUrl: './search-form.component.html',
-  styleUrl: './search-form.component.scss'
+  templateUrl: './search-widget.component.html',
+  styleUrl: './search-widget.component.scss'
 })
-export class SearchFormComponent implements OnInit {
+export class SearchWidgetComponent implements OnInit {
 
   @Input() facets: FacetConfig[] = [];
   @Input() minSearchLength?: number;

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {FormBuilder, FormGroup, ValidatorFn, AbstractControl} from '@angular/forms';
-import {FacetConfig, FacetType} from './search-form.model';
+import {FacetConfig, FacetType} from './search-widget.model';
 
 interface FacetHandler {
   createControl(facet: FacetConfig, formBuilder: FormBuilder): AbstractControl;
