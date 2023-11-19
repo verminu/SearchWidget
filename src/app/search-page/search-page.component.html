@@ -1,7 +1,7 @@
-
-<app-search-widget [facets]="searchConfig"
-                   (search)="search($event)"
-                   [minSearchLength]="2"
-                   [maxSearchLength]="16"
-></app-search-widget>
-
+<ng-container *ngIf="(searchConfig$ | async) as searchConfig">
+  <app-search-widget [facets]="searchConfig.config"
+                     (search)="search($event)"
+                     [minSearchLength]="searchConfig.options?.minSearchLength"
+                     [maxSearchLength]="searchConfig.options?.maxSearchLength"
+  ></app-search-widget>
+</ng-container>

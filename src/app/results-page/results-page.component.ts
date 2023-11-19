@@ -1,26 +1,22 @@
 import {Component, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {SearchStateService} from "../search-state.service";
+import {Store} from "@ngrx/store";
+import {searchResultsSelector} from "../store/search.feature";
 
 @Component({
   selector: 'app-results-page',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './results-page.component.html',
-  styleUrl: './results-page.component.scss'
+  styleUrls: ['./results-page.component.scss']
 })
 export class ResultsPageComponent implements OnInit {
-  searchResults: any; // Replace 'any' with your actual data type
+  searchResults$ = this.store.select(searchResultsSelector);
 
-  constructor(private searchStateService: SearchStateService) {}
+  constructor(private store: Store) {}
 
   ngOnInit(): void {
-    this.subscribeToSearchResults();
+
   }
 
-  private subscribeToSearchResults(): void {
-    this.searchStateService.searchResults$.subscribe(results => {
-      this.searchResults = results;
-    });
-  }
 }

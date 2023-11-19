@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {
-  FacetConfig,
+  FacetConfig, FacetsConfig,
   FacetType,
   FilterModel,
 } from "./search-widget.model";
@@ -29,11 +29,11 @@ import {DataMappingService} from "./data-mapping.service";
   imports: [CommonModule, ReactiveFormsModule, MatRadioModule, MatSelectModule, MatCheckboxModule, MatInputModule, MatButtonModule, MatIconModule],
   providers: [FormService, DataMappingService],
   templateUrl: './search-widget.component.html',
-  styleUrl: './search-widget.component.scss'
+  styleUrls: ['./search-widget.component.scss']
 })
 export class SearchWidgetComponent implements OnInit {
 
-  @Input() facets: FacetConfig[] = [];
+  @Input() facets: FacetsConfig = [];
   @Input() minSearchLength?: number;
   @Input() maxSearchLength?: number;
   @Output() search = new EventEmitter<FilterModel>();

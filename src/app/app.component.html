@@ -1,1 +1,9 @@
 <router-outlet></router-outlet>
+
+<div>
+  <mat-error *ngIf="error$ | async as error">
+    {{error}}
+  </mat-error>
+</div>
+
+<div *ngIf="loading$ | async">Loading...</div>

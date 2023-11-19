@@ -37,4 +37,4 @@ export type FilterModel = {
   selections?: {
     [facetKey: string]: FacetSelection
   }
-}
+} | null
