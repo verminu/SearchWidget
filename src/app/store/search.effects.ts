@@ -1,11 +1,12 @@
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {inject} from "@angular/core";
-import {routeActions, searchPageActions} from "./search.actions";
-import {catchError, map, of, switchMap, tap} from "rxjs";
+import {resultsPageActions, routeActions, searchPageActions} from "./search.actions";
+import {catchError, EMPTY, map, of, switchMap, tap, withLatestFrom} from "rxjs";
 import {Router} from "@angular/router";
 import {SearchService} from "../search.service";
 import {Store} from "@ngrx/store";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {searchFiltersSelector, searchResultsSelector} from "./search.feature";
 
 export const search = createEffect((
   actions$ = inject(Actions),
@@ -102,4 +103,26 @@ export const searchError = createEffect((
 }, {
   functional: true,
   dispatch: false
+})
+
+export const loadResultsIfNone = createEffect((
+  actions$ = inject(Actions),
+  store = inject(Store),
+) => {
+  return actions$.pipe(
+    ofType(resultsPageActions.pageLoaded),
+    withLatestFrom(
+      store.select(searchResultsSelector),
+      store.select(searchFiltersSelector)
+    ),
+    switchMap(([_, results, filters]) => {
+      if (results === null) {
+        return of(searchPageActions.searchInitiated({ filters }));
+      }
+      return EMPTY;
+    })
+  )
+}, {
+  functional: true,
+  dispatch: true
 })

@@ -25,12 +25,17 @@
         <tr mat-row *matRowDef="let row; columns: columnNames;"></tr>
       </table>
 
-      <div *ngIf="!tableDataSource.data.length" class="no-results-container">
+      <div *ngIf="!tableDataSource.data.length && !(loading$ | async)" class="no-results-container">
         <mat-icon>search_off</mat-icon>
         <p>No results found. Try adjusting your search criteria or filters to find what you're looking for.</p>
       </div>
 
-      <mat-paginator *ngIf="tableDataSource.data.length"
+      <div *ngIf="loading$ | async" class="loading-in-progress-container">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Loading results...</p>
+      </div>
+
+      <mat-paginator [class.d-none]="!tableDataSource.data.length"
                      [pageSizeOptions]="[5, 10, 20]"
                      showFirstLastButtons>
       </mat-paginator>

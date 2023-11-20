@@ -1,16 +1,20 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {Store} from "@ngrx/store";
-import {searchFiltersSelector, searchResultsColumns, searchResultsSelector} from "../store/search.feature";
+import {
+  searchFiltersSelector,
+  searchInProgressSelector,
+  searchResultsColumns,
+  searchResultsSelector
+} from "../store/search.feature";
 import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 import {MatPaginator, MatPaginatorModule} from "@angular/material/paginator";
-import {Subject, takeUntil} from "rxjs";
+import {BehaviorSubject, combineLatest, Subject, takeUntil} from "rxjs";
 import {MatChipsModule} from "@angular/material/chips";
 import {FilterModel} from "../shared/search-widget/search-widget.model";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
-import {ActivatedRoute, Router} from "@angular/router";
-import {routeActions} from "../store/search.actions";
+import {resultsPageActions, routeActions} from "../store/search.actions";
 
 type FilterChip = { label: string, value: any }
 
@@ -25,6 +29,7 @@ export class ResultsPageComponent implements OnInit, OnDestroy, AfterViewInit {
   searchResults$ = this.store.select(searchResultsSelector);
   displayedColumns$ = this.store.select(searchResultsColumns);
   searchFilters$ = this.store.select(searchFiltersSelector);
+  loading$ = this.store.select(searchInProgressSelector);
 
   tableDataSource!: MatTableDataSource<any>;
   displayedColumns!: {
@@ -41,15 +46,19 @@ export class ResultsPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private store: Store,
-  ) {}
+  ) {
+    this.tableDataSource = new MatTableDataSource<any>([]);
+  }
 
   ngAfterViewInit() {
     this.tableDataSource.paginator = this.paginator;
   }
 
   ngOnInit(): void {
+    this.store.dispatch(resultsPageActions.pageLoaded());
+
     this.searchResults$.pipe(takeUntil(this.unsubscribe$)).subscribe(results => {
-      this.tableDataSource = new MatTableDataSource<any>(results);
+      this.tableDataSource.data = results || [];
     })
 
     this.displayedColumns$.pipe(takeUntil(this.unsubscribe$)).subscribe(columns => {

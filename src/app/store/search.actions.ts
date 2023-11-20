@@ -12,6 +12,13 @@ export const searchPageActions = createActionGroup({
   }
 })
 
+export const resultsPageActions = createActionGroup({
+  source: 'Results  Page',
+  events: {
+    'Page loaded': emptyProps()
+  }
+})
+
 export const mainPageActions = createActionGroup({
   source: 'Main Page',
   events: {
