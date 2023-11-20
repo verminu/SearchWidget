@@ -27,11 +27,11 @@ export class SearchService {
       delay(1000),
     );
 
-    // return timer(1000).pipe(
+    // return (timer(1000).pipe(
     //   tap(() => {
     //     throw new Error("an unexpected error occurred");
     //   })
-    // )
+    // ) as unknown as Observable<BookModel[]>)
   }
 
   private filterBooks(criteria: FilterModel): BookModel[] {

@@ -1,0 +1,17 @@
+.page-container {
+  box-sizing: border-box;
+}
+
+.no-results-container {
+  text-align: center;
+  padding: 2rem;
+  color: #757575;
+  font-size: 1.2rem;
+
+  mat-icon {
+    margin-bottom: 1rem;
+    font-size: 3rem;
+    height: 3rem;
+    width: 3rem;
+  }
+}

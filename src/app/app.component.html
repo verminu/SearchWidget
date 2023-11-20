@@ -1,9 +1,9 @@
-<router-outlet></router-outlet>
+<mat-toolbar color="primary">
+  Reusable search component: Search books
+</mat-toolbar>
 
-<div>
-  <mat-error *ngIf="error$ | async as error">
-    {{error}}
-  </mat-error>
+<mat-progress-bar class="loading-indicator" *ngIf="loading$ | async" mode="indeterminate" color="accent"></mat-progress-bar>
+
+<div class="router-container pt-3">
+  <router-outlet></router-outlet>
 </div>
-
-<div *ngIf="loading$ | async">Loading...</div>

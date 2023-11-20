@@ -1,7 +1,6 @@
 @use "../../../styles/mixins";
 
 :host {
-  width: 26rem;
   display: block;
 }
 
@@ -20,13 +19,13 @@
 }
 
 .facet-container {
-  display: contents; /* Makes the container transparent, allowing its children to be part of the grid */
+  display: contents;
 }
 
 .facet-label {
-  white-space: nowrap; /* Prevents text wrapping */
+  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* Adds ellipsis for overflowed text */
+  text-overflow: ellipsis;
 
   .facet-container--checkboxes & {
     line-height: var(--mdc-checkbox-state-layer-size);
@@ -41,10 +40,8 @@
 
 mat-radio-group {
   display: flex;
+  gap: 1rem;
 
-  mat-radio-button {
-    flex: 1; /* Each container takes equal space */
-  }
 }
 
 .form-field--checkboxes {
@@ -54,6 +51,6 @@ mat-radio-group {
 
 .scrollable-container {
   @include mixins.custom-scrollbar();
-  max-height: 24rem;
+  max-height: 32rem;
   padding: 0.5rem;
 }

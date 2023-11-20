@@ -5,10 +5,10 @@ import {catchError, map, of, switchMap, tap} from "rxjs";
 import {Router} from "@angular/router";
 import {SearchService} from "../search.service";
 import {Store} from "@ngrx/store";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 export const search = createEffect((
   actions$ = inject(Actions),
-  router = inject(Router),
   searchService = inject(SearchService)
 ) => {
   return actions$.pipe(
@@ -78,6 +78,25 @@ export const navigateToResultsPage = createEffect((
       router.navigate(['results']).then(() => {
         store.dispatch(routeActions.updateRouteToResults());
       })
+    })
+  )
+}, {
+  functional: true,
+  dispatch: false
+})
+
+export const searchError = createEffect((
+  actions$ = inject(Actions),
+  snackBar = inject(MatSnackBar)
+) => {
+  return actions$.pipe(
+    ofType(searchPageActions.searchFailure),
+    tap((action) => {
+      snackBar.open(action.error.message, 'Close', {
+        duration: 5000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+      });
     })
   )
 }, {

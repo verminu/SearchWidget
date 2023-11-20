@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterOutlet} from '@angular/router';
 import {SearchWidgetComponent} from "./shared/search-widget/search-widget.component";
@@ -7,16 +7,18 @@ import {mainPageActions} from "./store/search.actions";
 import {resultsColumns, searchWidgetConfig, searchWidgetParams} from "./search-widget.data";
 import {MatInputModule} from "@angular/material/input";
 import {searchErrorSelector, searchInProgressSelector} from "./store/search.feature";
+import {MatProgressBarModule} from "@angular/material/progress-bar";
+import {Subject, takeUntil} from "rxjs";
+import {MatToolbarModule} from "@angular/material/toolbar";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SearchWidgetComponent, MatInputModule],
+  imports: [CommonModule, RouterOutlet, SearchWidgetComponent, MatInputModule, MatProgressBarModule, MatToolbarModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  error$ = this.store.select(searchErrorSelector);
   loading$ = this.store.select(searchInProgressSelector);
 
   constructor(private store: Store) {

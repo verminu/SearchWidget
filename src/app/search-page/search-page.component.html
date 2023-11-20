@@ -1,8 +1,15 @@
 <ng-container *ngIf="(searchConfig$ | async) as searchConfig">
-  <app-search-widget [facets]="searchConfig.config"
-                     [filters]="(searchFilters$ | async)"
-                     (search)="search($event)"
-                     [minSearchLength]="searchConfig.options?.minSearchLength"
-                     [maxSearchLength]="searchConfig.options?.maxSearchLength"
-  ></app-search-widget>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="search-widget-container col-md-8 p-3 mat-elevation-z8" [class.loading]="loading$ | async">
+        <app-search-widget [facets]="searchConfig.config"
+                           [filters]="(searchFilters$ | async)"
+                           (search)="search($event)"
+                           [minSearchLength]="searchConfig.options?.minSearchLength"
+                           [maxSearchLength]="searchConfig.options?.maxSearchLength"
+        ></app-search-widget>
+        <div class="loading-overlay"></div>
+      </div>
+    </div>
+  </div>
 </ng-container>

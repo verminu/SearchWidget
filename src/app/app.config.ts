@@ -8,9 +8,11 @@ import {provideEffects} from "@ngrx/effects";
 import {provideStoreDevtools} from "@ngrx/store-devtools";
 import {searchFeatureKey, searchReducer} from "./store/search.feature";
 import * as searchEffects from "./store/search.effects";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    MatSnackBar,
     provideRouter(routes),
     provideAnimations(),
     provideStore(),
