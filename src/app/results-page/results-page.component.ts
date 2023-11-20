@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {Store} from "@ngrx/store";
 import {
@@ -9,7 +9,7 @@ import {
 } from "../store/search.feature";
 import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 import {MatPaginator, MatPaginatorModule} from "@angular/material/paginator";
-import {BehaviorSubject, combineLatest, Subject, takeUntil} from "rxjs";
+import {Subject, takeUntil} from "rxjs";
 import {MatChipsModule} from "@angular/material/chips";
 import {FilterModel} from "../shared/search-widget/search-widget.model";
 import {MatButtonModule} from "@angular/material/button";

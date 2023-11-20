@@ -1,11 +1,21 @@
 import {Injectable} from '@angular/core';
-import {FormBuilder, FormGroup, ValidatorFn, AbstractControl} from '@angular/forms';
-import {FacetConfig, FacetType} from './search-widget.model';
+import {FormBuilder, FormGroup, ValidatorFn, AbstractControl, FormArray, FormControl} from '@angular/forms';
+import {
+  FacetConfig,
+  FacetType,
+  FilterModel, FilterSelection,
+  ListSelection,
+  YesNoSelection
+} from './search-widget.model';
 
 interface FacetHandler {
   createControl(facet: FacetConfig, formBuilder: FormBuilder): AbstractControl;
+
   validateFacetConfig(facet: FacetConfig): true | string;
+
   processData(facet: FacetConfig): void;
+
+  patchFormSelections(formControl: AbstractControl, selections: any, facet: FacetConfig): void;
 }
 
 export type FormOptions = {
@@ -28,6 +38,9 @@ export class FormService {
     this.registerFacetHandlers();
   }
 
+  /**
+   * Create the search form with facets and options
+   */
   createSearchForm(facets: FacetConfig[], options: FormOptions): FormGroup {
     // Validate and set search length defaults
     const {minSearchLength, maxSearchLength} = this.validateAndSetSearchLengths(options);
@@ -53,6 +66,44 @@ export class FormService {
 
   getOptions(): FormOptions {
     return {...this.options};
+  }
+
+  resetForm(form: FormGroup, facets: FacetConfig[]) {
+    form.reset({
+      searchTerm: '',
+      selections: this.buildInitialSelections(facets)
+    });
+  }
+
+  updateFilters(form: FormGroup, filters: FilterModel | null, facets: FacetConfig[]) {
+    if (form && filters) {
+      this.resetForm(form, facets);
+      this.patchForm(form, filters, facets);
+    }
+  }
+
+  private buildInitialSelections(facets: FacetConfig[]): Record<string, any> {
+    const selectionsGroup: Record<string, any> = {};
+
+    facets.forEach(facet => {
+      if (facet.type === FacetType.Checkboxes && facet.data) {
+        selectionsGroup[facet.key] = Array.from(facet.data.keys()).map(() => false);
+      } else {
+        selectionsGroup[facet.key] = null;
+      }
+    });
+
+    return selectionsGroup;
+  }
+
+  private patchForm(form: FormGroup, filters: FilterModel, facets: FacetConfig[]) {
+    if (form && filters) {
+      form.patchValue({
+        searchTerm: filters?.searchTerm,
+      });
+
+      this.patchFormSelections(form, filters.selections, facets);
+    }
   }
 
   private registerFacetHandlers() {
@@ -127,6 +178,36 @@ export class FormService {
       return isValid ? null : {'searchInvalid': true};
     };
   }
+
+  private patchFormSelections(form: FormGroup, selections: FilterSelection | undefined | null, facets: FacetConfig[]) {
+    if (!selections) {
+      return;
+    }
+
+    const selectionsGroup = form.get('selections') as FormGroup;
+
+    for (const facetKey of Object.keys(selections)) {
+      const facet = facets.find((f) => f.key === facetKey);
+      if (!facet) {
+        console.error(`Facet config not found for key: ${facetKey}`);
+        continue;
+      }
+
+      const handler = this.facetHandlerRegistry.get(facet.type);
+      if (!handler) {
+        console.error(`Handler not found for facet type: ${facet.type}`);
+        continue;
+      }
+
+      const formControl = selectionsGroup.get(facetKey);
+      if (!formControl) {
+        console.error(`Form control not found for facet key: ${facetKey}`);
+        continue;
+      }
+
+      handler.patchFormSelections(formControl, selections[facetKey], facet);
+    }
+  }
 }
 
 class CheckboxFacetHandler implements FacetHandler {
@@ -147,6 +228,23 @@ class CheckboxFacetHandler implements FacetHandler {
   processData(facet: FacetConfig) {
     facet.data = [...facet.data!].sort();
   }
+
+  patchFormSelections(formControl: FormArray, selections: ListSelection, facet: FacetConfig) {
+    if (!selections || !facet.data) {
+      return
+    }
+
+    const controlValue = formControl.value as boolean[];
+
+    selections.forEach(selection => {
+      const selectionIndex = facet.data!.indexOf(selection);
+      if (selectionIndex >= 0) {
+        controlValue[selectionIndex] = true;
+      }
+    })
+
+    formControl.patchValue(controlValue);
+  }
 }
 
 class MultiselectFacetHandler implements FacetHandler {
@@ -165,6 +263,10 @@ class MultiselectFacetHandler implements FacetHandler {
   processData(facet: FacetConfig) {
     facet.data = [...facet.data!].sort();
   }
+
+  patchFormSelections(formControl: FormGroup, selections: ListSelection, facet: FacetConfig) {
+    formControl.setValue(selections);
+  }
 }
 
 class YesNoFacetHandler implements FacetHandler {
@@ -178,5 +280,9 @@ class YesNoFacetHandler implements FacetHandler {
 
   processData(facet: FacetConfig) {
 
+  }
+
+  patchFormSelections(formControl: FormControl, selections: YesNoSelection, facet: FacetConfig) {
+    formControl.setValue(selections);
   }
 }

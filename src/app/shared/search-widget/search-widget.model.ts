@@ -29,14 +29,16 @@ export type FacetSelection =
   YesNoSelection |
   ListSelection
 
+export type FilterSelection = {
+  [facetKey: string]: FacetSelection
+}
+
 // defines the type of the data emitted by the search event
 export type FilterModel = {
   // search query
   searchTerm?: string;
   // selections for each facet
-  selections?: {
-    [facetKey: string]: FacetSelection
-  }
+  selections?: FilterSelection
 } | null
 
 export type ResultsColumn = [key: string, label: string]

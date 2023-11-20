@@ -33,23 +33,34 @@ import {DataMappingService} from "./data-mapping.service";
 })
 export class SearchWidgetComponent implements OnInit, OnChanges {
 
+  // Facets configuration for the search widget.
   @Input() facets: FacetsConfig = [];
-  @Input() minSearchLength?: number;
-  @Input() maxSearchLength?: number;
-  @Output() search = new EventEmitter<FilterModel>();
+
+  // Initial filters (if any) to populate the form.
   @Input() filters: FilterModel | null = null;
 
-  // stores all validated facet configurations
+  // Minimum and maximum search length constraints.
+  @Input() minSearchLength?: number;
+  @Input() maxSearchLength?: number;
+
+  // EventEmitter to emit search filter when the search is initiated.
+  @Output() search = new EventEmitter<FilterModel>();
+
+  // Stores all validated facet configurations
   facetConfig: FacetConfig[] = []
 
-  // the main form group
+  // The main form group
   searchForm!: FormGroup;
 
+  // Reference to the error field in the template.
   @ViewChild('errorField') errorField!: ElementRef;
 
   FacetType = FacetType;
 
+  // The search term entered by the user in the input field.
   searchTerm: string = '';
+
+  // Options for minimum and maximum search length.
   minSearchLengthOption!: number;
   maxSearchLengthOption!: number;
 
@@ -59,20 +70,24 @@ export class SearchWidgetComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit() {
+    // Initialize the search form with specified facets
     this.searchForm = this.formService.createSearchForm(this.facets, {
       minSearchLength: this.minSearchLength,
       maxSearchLength: this.maxSearchLength,
     })
 
-    this.updateFilters();
-
-    // get the processed and sanitized facet configuration
+    // Get the processed and sanitized facet configuration
     this.facetConfig = this.formService.getFacetConfig();
 
+    // Extract sanitized options.
     this.extractSanitizedOptions(this.formService.getOptions());
+
+    // Update filters if provided.
+    this.updateFilters();
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    // Update filters if 'filters' input changes.
     if (changes['filters'] && this.filters) {
       this.updateFilters();
     }
@@ -90,40 +105,20 @@ export class SearchWidgetComponent implements OnInit, OnChanges {
 
     // apply data mapping to raw filter values
     const filters = this.dataMappingService.mapRawValues(this.searchForm.value, this.facetConfig);
+
+    // trigger the event emitter
     this.search.emit(filters);
   }
 
+  /**
+   * Reset the form to its initial state.
+   */
   resetForm() {
-    // Reset the form here
-    this.searchForm.reset({
-      searchTerm: '', // Reset searchTerm to empty string
-      selections: this.buildInitialSelections() // Reset selections to initial state
-    });
-  }
-
-  private buildInitialSelections(): Record<string, any> {
-    const selectionsGroup: Record<string, any> = {};
-
-    this.facets.forEach(facet => {
-      if (facet.type === FacetType.Checkboxes && facet.data) {
-        selectionsGroup[facet.key] = Array.from(facet.data.keys()).map(() => false);
-      } else {
-        selectionsGroup[facet.key] = null;
-      }
-    });
-
-    return selectionsGroup;
+    this.formService.resetForm(this.searchForm, this.facetConfig);
   }
 
   private updateFilters() {
-    if (this.searchForm && this.filters) {
-      this.resetForm();
-
-      this.searchForm.patchValue({
-        searchTerm: this.filters.searchTerm,
-        selections: this.filters.selections
-      });
-    }
+    this.formService.updateFilters(this.searchForm, this.filters, this.facetConfig);
   }
 
   private scrollToError() {
