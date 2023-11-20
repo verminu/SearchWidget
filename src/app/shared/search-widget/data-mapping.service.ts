@@ -69,11 +69,11 @@ class CheckboxMappingStrategy implements FacetMappingStrategy {
   mapValue(checkboxValues: boolean[], facetConfig: FacetConfig): ListSelection | undefined {
     if (!facetConfig.data) return undefined;
 
-    const selections = Array.from(facetConfig.data.entries())
-      .filter(([], index) => checkboxValues[index])
-      .map(([key, label]): [string, string] => [key, label]);
+    const selections = checkboxValues
+      .map((checked, index) => checked ? facetConfig.data![index] : null)
+      .filter(value => value !== null);
 
-    return selections.length ? selections : undefined;
+    return selections.length ? (selections as ListSelection) : undefined;
   }
 }
 

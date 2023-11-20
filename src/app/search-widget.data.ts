@@ -1,6 +1,11 @@
 import {FacetsConfig, FacetType} from "./shared/search-widget/search-widget.model";
 import {FormOptions} from "./shared/search-widget/form.service";
 
+const bookGenres = ['Science Fiction', 'Fantasy', 'Adventure', 'Romance', 'Mystery', 'Historical Fiction', 'Drama', 'Philosophy', 'Mythology'];
+const bookLanguages = ['English', 'Chinese', 'French', 'Spanish', 'Arabic', 'Italian', 'Japanese', 'Korean', 'Swedish', 'German', 'Russian', 'Greek', 'Swahili', 'Portuguese'];
+const bookTypes = ['Hardcover', 'Anthology', 'Illustrated Edition', 'Paperback', 'First Edition', 'Graphic Novel', 'Biography', 'Novella', 'Textbook', 'Play', 'Encyclopedia', 'Short Story Collection', 'Memoir', 'Travel Guide', 'Poetry Collection', 'Journal', 'Academic Paper', 'Detective Novel', 'Novel', 'Ebook', 'Historical Novel', 'Travelogue', 'Manga', 'Collection'];
+
+
 export const searchWidgetParams: FormOptions = {
   minSearchLength: 2,
   maxSearchLength: 20
@@ -8,83 +13,31 @@ export const searchWidgetParams: FormOptions = {
 
 export const searchWidgetConfig: FacetsConfig = [
   {
-    key: 'isActive',
-    type: FacetType.YesNo,
-    label: 'Active'
-  },
-  {
-    key: 'lang',
+    key: 'genre',
+    label: 'Genre',
     type: FacetType.Multiselect,
+    data: bookGenres
+  },
+  {
+    key: 'language',
     label: 'Language',
-    data: new Map([
-      ['en', 'English'],
-      ['ro', 'Romanian'],
-      ['pl', 'Polish'],
-      ['fr', 'French'],
-      ['de', 'German'],
-      ['es', 'Spanish'],
-      ['it', 'Italian'],
-      ['jp', 'Japanese'],
-      ['cn', 'Chinese'],
-    ]),
-  },
-  {
-    key: 'isActive_1',
-    type: FacetType.YesNo,
-    label: 'Active'
-  },
-  {
-    key: 'appType',
-    type: FacetType.Checkboxes,
-    label: 'Type',
-    data: new Map([
-      ['system', 'System'],
-      ['app', 'Application'],
-      ['web', 'Web'],
-      ['mobile', 'Mobile'],
-      ['desktop', 'Desktop'],
-      ['cloud', 'Cloud'],
-      ['iot', 'IoT'],
-      ['ai', 'Artificial Intelligence'],
-      ['ml', 'Machine Learning'],
-      ['data', 'Data Analysis'],
-      ['network', 'Networking'],
-      ['security', 'Security'],
-      ['blockchain', 'Blockchain'],
-    ]),
-  },
-  {
-    key: 'lang_2',
     type: FacetType.Multiselect,
-    label: 'Language',
-    data: new Map([
-      ['jp', 'Japanese'],
-      ['cn', 'Chinese'],
-      ['pt', 'Portuguese'],
-      ['nl', 'Dutch'],
-      ['ko', 'Korean'],
-      ['ar', 'Arabic'],
-      ['sv', 'Swedish'],
-      ['no', 'Norwegian'],
-    ]),
+    data: bookLanguages
   },
   {
-    key: 'appType_2',
-    type: FacetType.Checkboxes,
-    label: 'Type',
-    data: new Map([
-      ['security', 'Security'],
-      ['blockchain', 'Blockchain'],
-      ['vr', 'Virtual Reality'],
-      ['ar', 'Augmented Reality'],
-      ['gaming', 'Gaming'],
-      ['software', 'Software Development'],
-      ['hardware', 'Hardware'],
-      ['database', 'Database'],
-      ['devops', 'DevOps'],
-      ['qa', 'Quality Assurance'],
-      ['uiux', 'UI/UX Design'],
-      ['e-commerce', 'E-commerce'],
-    ]),
+    key: 'isAvailable',
+    label: 'Available',
+    type: FacetType.YesNo
   },
-];
+  {
+    key: 'isDigitalFormat',
+    label: 'E-book',
+    type: FacetType.YesNo
+  },
+  {
+    key: 'type',
+    label: 'Type',
+    type: FacetType.Checkboxes,
+    data: bookTypes
+  }
+]

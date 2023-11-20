@@ -49,8 +49,8 @@
                 <mat-form-field subscriptSizing="dynamic">
                   <mat-label>Select</mat-label>
                   <mat-select [formControlName]="facet.key" multiple>
-                    <mat-option *ngFor="let option of (facet.data ? (facet.data | keyvalue : preserveMapOrderComparator) : [])"
-                                [value]="[option.key, option.value]">{{option.value}}</mat-option>
+                    <mat-option *ngFor="let option of facet.data"
+                                [value]="option">{{option}}</mat-option>
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -58,8 +58,8 @@
 
             <ng-container *ngSwitchCase="FacetType.Checkboxes">
               <div [formArrayName]="facet.key" class="form-field--checkboxes">
-                <div class="w-100" *ngFor="let option of (facet.data ? (facet.data | keyvalue : preserveMapOrderComparator) : []); let i = index;">
-                  <mat-checkbox [formControlName]="i">{{option.value}}</mat-checkbox>
+                <div class="w-100" *ngFor="let option of facet.data; let i = index;">
+                  <mat-checkbox [formControlName]="i">{{option}}</mat-checkbox>
                 </div>
               </div>
             </ng-container>

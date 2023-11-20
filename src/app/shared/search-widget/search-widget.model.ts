@@ -11,7 +11,7 @@ export type FacetConfig = {
   type: FacetType; // specify the type of the widget to be displayed
   label: string; // the label of the widget
   key: string; // each widget has a unique key, so it can be identified
-  data?: Map<string, string> // additional data needed for displaying a facet
+  data?: string[] // additional data needed for displaying a facet
 }
 
 export type FacetsConfig = FacetConfig[]
@@ -23,7 +23,7 @@ export type FacetsConfig = FacetConfig[]
 // true = yes, false = no, null = irrelevant
 export type YesNoSelection = true | false | null;
 
-export type ListSelection = [string, string][];
+export type ListSelection = string[];
 
 export type FacetSelection =
   YesNoSelection |

@@ -4,8 +4,8 @@ import {FacetConfig, FacetType} from './search-widget.model';
 
 interface FacetHandler {
   createControl(facet: FacetConfig, formBuilder: FormBuilder): AbstractControl;
-
   validateFacetConfig(facet: FacetConfig): true | string;
+  processData(facet: FacetConfig): void;
 }
 
 export type FormOptions = {
@@ -86,7 +86,9 @@ export class FormService {
   }
 
   private addFacetControls(form: FormGroup, facets: FacetConfig[]): void {
-    facets.forEach(facet => {
+    facets.forEach(f => {
+      const facet = {...f};
+
       if (!this.isFacetKeyUnique(facet.key)) {
         console.error(`Duplicate facet key ${facet.key}`);
         return;
@@ -103,6 +105,8 @@ export class FormService {
         console.error(facetConfigValidation);
         return;
       }
+
+      handler.processData(facet);
 
       const control = handler.createControl(facet, this.formBuilder);
       (form.get('selections') as FormGroup).addControl(facet.key, control);
@@ -128,16 +132,20 @@ export class FormService {
 class CheckboxFacetHandler implements FacetHandler {
   createControl(facet: FacetConfig, formBuilder: FormBuilder): AbstractControl {
     return formBuilder.array(
-      Array.from(facet.data!.keys()).map(() => formBuilder.control(false))
+      facet.data!.map(() => formBuilder.control(false))
     );
   }
 
   validateFacetConfig(facet: FacetConfig): true | string {
-    if (!facet.data?.size) {
-      return `Checkbox facet '${facet.key}' requires a non-empty 'data' property`;
+    if (!Array.isArray(facet.data) || !facet.data.length) {
+      return `Checkbox facet '${facet.key}' requires a non-empty array 'data' property`;
     }
 
     return true;
+  }
+
+  processData(facet: FacetConfig) {
+    facet.data = [...facet.data!].sort();
   }
 }
 
@@ -147,11 +155,15 @@ class MultiselectFacetHandler implements FacetHandler {
   }
 
   validateFacetConfig(facet: FacetConfig): true | string {
-    if (!facet.data?.size) {
-      return `Multiselect facet '${facet.key}' requires a non-empty 'data' property`;
+    if (!Array.isArray(facet.data) || !facet.data.length) {
+      return `Multiselect facet '${facet.key}' requires a non-empty array 'data' property`;
     }
 
     return true;
+  }
+
+  processData(facet: FacetConfig) {
+    facet.data = [...facet.data!].sort();
   }
 }
 
@@ -162,5 +174,9 @@ class YesNoFacetHandler implements FacetHandler {
 
   validateFacetConfig(facet: FacetConfig): true | string {
     return true;
+  }
+
+  processData(facet: FacetConfig) {
+
   }
 }
