@@ -4,7 +4,7 @@ import {RouterOutlet} from '@angular/router';
 import {SearchWidgetComponent} from "./shared/search-widget/search-widget.component";
 import {Store} from "@ngrx/store";
 import {mainPageActions} from "./store/search.actions";
-import {searchWidgetConfig, searchWidgetParams} from "./search-widget.data";
+import {resultsColumns, searchWidgetConfig, searchWidgetParams} from "./search-widget.data";
 import {MatInputModule} from "@angular/material/input";
 import {searchErrorSelector, searchInProgressSelector} from "./store/search.feature";
 
@@ -23,9 +23,12 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.store.dispatch(mainPageActions.setWidgetConfig({
-      config: searchWidgetConfig,
-      options: searchWidgetParams
+    this.store.dispatch(mainPageActions.setSearchParams({
+      searchParams: {
+        config: searchWidgetConfig,
+        options: searchWidgetParams,
+        columns: resultsColumns,
+      }
     }));
   }
 

@@ -1,12 +1,14 @@
-import {FacetsConfig, FilterModel} from "../shared/search-widget/search-widget.model";
+import {FacetsConfig, FilterModel, ResultsColumn} from "../shared/search-widget/search-widget.model";
 import {FormOptions} from "../shared/search-widget/form.service";
 import {createReducer, on} from "@ngrx/store";
 import {mainPageActions, searchPageActions} from "./search.actions";
+import {BookModel} from "../search.service";
 
 export interface SearchStateInterface {
-  widget: {
+  searchParams: {
     config: FacetsConfig,
-    options?: FormOptions
+    options?: FormOptions,
+    columns: ResultsColumn[],
   },
   results: any[],
   filters: FilterModel,
@@ -15,9 +17,10 @@ export interface SearchStateInterface {
 }
 
 const initialState: SearchStateInterface = {
-  widget: {
+  searchParams: {
     config: [],
-    options: {}
+    options: {},
+    columns: [],
   },
   results: [],
   filters: null,
@@ -28,9 +31,9 @@ const initialState: SearchStateInterface = {
 export const SearchReducer = createReducer(
   initialState,
 
-  on(mainPageActions.setWidgetConfig, (state, action) => ({
+  on(mainPageActions.setSearchParams, (state, action) => ({
     ...state,
-    widget: {...action}
+    searchParams: {...action.searchParams},
   })),
 
   on(searchPageActions.searchInitiated, (state, action) => ({

@@ -1,21 +1,30 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {FilterModel} from "./shared/search-widget/search-widget.model";
 import {delay, Observable, of, tap, timer} from "rxjs";
 import {books} from "../db";
 
+export type BookModel = {
+  title: string,
+  author: string,
+  language: string,
+  genre: string,
+  isAvailable: boolean,
+  isDigitalFormat: boolean,
+  type: string
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class SearchService {
 
-  constructor() { }
+  constructor() {
+  }
 
-  search(criteria: FilterModel): Observable<any[]> {
+  search(criteria: FilterModel): Observable<BookModel[]> {
     return of(this.filterBooks(criteria)).pipe(
       delay(1000),
-
     );
 
     // return timer(1000).pipe(
@@ -25,15 +34,15 @@ export class SearchService {
     // )
   }
 
-  private filterBooks(criteria: FilterModel): any[] {
+  private filterBooks(criteria: FilterModel): BookModel[] {
     if (!criteria) {
       return books;
     }
 
     const searchTermWords = criteria.searchTerm?.toLowerCase().split(' ') || [];
-    const { selections } = criteria;
+    const {selections} = criteria;
 
-    return books.filter((book: any) => {
+    return books.filter((book: BookModel) => {
       // Check for search term
       const searchTermMatch = searchTermWords.length === 0 || searchTermWords.every(word =>
         book.title.toLowerCase().includes(word) ||
@@ -51,6 +60,6 @@ export class SearchService {
       const typeMatch = !selections?.['type'] || (selections['type'] as Array<string>).some(type => book.type === type);
 
       return searchTermMatch && genreMatch && languageMatch && isAvailableMatch && isDigitalFormatMatch && typeMatch;
-    });
+    }).sort((a, b) => a.title.localeCompare(b.title));
   }
 }

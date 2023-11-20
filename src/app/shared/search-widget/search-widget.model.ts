@@ -38,3 +38,5 @@ export type FilterModel = {
     [facetKey: string]: FacetSelection
   }
 } | null
+
+export type ResultsColumn = [key: string, label: string]
