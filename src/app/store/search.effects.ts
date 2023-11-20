@@ -42,7 +42,9 @@ export const searchCompleted = createEffect((
   actions$ = inject(Actions)
 ) => {
   return actions$.pipe(
-    ofType(searchPageActions.searchSuccess, searchPageActions.searchFailure),
+    ofType(
+      searchPageActions.searchSuccess,
+      searchPageActions.searchFailure),
     map(() => searchPageActions.searchCompleted())
   )
 }, {

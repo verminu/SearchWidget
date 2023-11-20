@@ -101,10 +101,6 @@ export class SearchWidgetComponent implements OnInit, OnChanges {
     });
   }
 
-  preserveMapOrderComparator() {
-    return 0;
-  }
-
   private buildInitialSelections(): Record<string, any> {
     const selectionsGroup: Record<string, any> = {};
 
@@ -121,6 +117,8 @@ export class SearchWidgetComponent implements OnInit, OnChanges {
 
   private updateFilters() {
     if (this.searchForm && this.filters) {
+      this.resetForm();
+
       this.searchForm.patchValue({
         searchTerm: this.filters.searchTerm,
         selections: this.filters.selections

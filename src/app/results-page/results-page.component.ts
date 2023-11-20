@@ -55,7 +55,9 @@ export class ResultsPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.store.dispatch(resultsPageActions.pageLoaded());
+    setTimeout(() => {
+      this.store.dispatch(resultsPageActions.pageLoaded());
+    });
 
     this.searchResults$.pipe(takeUntil(this.unsubscribe$)).subscribe(results => {
       this.tableDataSource.data = results || [];
@@ -71,6 +73,8 @@ export class ResultsPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.searchFilters$.pipe(takeUntil(this.unsubscribe$)).subscribe(filters => {
       this.filterChips = this.prepareFilterChips(filters);
     });
+
+
   }
 
   ngOnDestroy() {

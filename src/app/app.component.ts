@@ -1,14 +1,13 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterOutlet} from '@angular/router';
 import {SearchWidgetComponent} from "./shared/search-widget/search-widget.component";
 import {Store} from "@ngrx/store";
 import {mainPageActions} from "./store/search.actions";
-import {resultsColumns, searchWidgetConfig, searchWidgetParams} from "./search-widget.data";
+import {resultsColumns, searchWidgetConfig, searchWidgetParams} from "./search-params.data";
 import {MatInputModule} from "@angular/material/input";
-import {searchErrorSelector, searchInProgressSelector} from "./store/search.feature";
+import {searchInProgressSelector} from "./store/search.feature";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
-import {Subject, takeUntil} from "rxjs";
 import {MatToolbarModule} from "@angular/material/toolbar";
 
 @Component({
