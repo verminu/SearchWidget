@@ -122,8 +122,8 @@ export class FormService {
 
   private searchValidator(minLength: number, maxLength: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
-      const input = control.value.trim();
-      const isValid = input === '' || (input.length >= minLength && input.length <= maxLength);
+      const input = control.value?.trim();
+      const isValid = !input || (input.length >= minLength && input.length <= maxLength);
       return isValid ? null : {'searchInvalid': true};
     };
   }

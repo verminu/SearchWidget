@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import {SearchWidgetComponent} from "../shared/search-widget/search-widget.component";
 import {FilterModel} from "../shared/search-widget/search-widget.model";
 import {Store} from "@ngrx/store";
-import {searchWidgetConfigSelector} from "../store/search.feature";
+import {searchFiltersSelector, searchWidgetConfigSelector} from "../store/search.feature";
 import {searchPageActions} from "../store/search.actions";
 
 @Component({
@@ -17,6 +17,7 @@ import {searchPageActions} from "../store/search.actions";
 export class SearchPageComponent implements OnInit {
 
   searchConfig$ = this.store.select(searchWidgetConfigSelector);
+  searchFilters$ = this.store.select(searchFiltersSelector);
 
   constructor(private store: Store) {}
 

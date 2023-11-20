@@ -30,7 +30,7 @@ export class DataMappingService {
   }
 
   private sanitizeSearchTerm(input: string): string | undefined {
-    const trimmedInput = input.trim();
+    const trimmedInput = input?.trim();
     return trimmedInput ? trimmedInput : undefined;
   }
 

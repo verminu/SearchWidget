@@ -2,9 +2,9 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  Input,
+  Input, OnChanges,
   OnInit,
-  Output,
+  Output, SimpleChanges,
   ViewChild
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
@@ -31,12 +31,13 @@ import {DataMappingService} from "./data-mapping.service";
   templateUrl: './search-widget.component.html',
   styleUrls: ['./search-widget.component.scss']
 })
-export class SearchWidgetComponent implements OnInit {
+export class SearchWidgetComponent implements OnInit, OnChanges {
 
   @Input() facets: FacetsConfig = [];
   @Input() minSearchLength?: number;
   @Input() maxSearchLength?: number;
   @Output() search = new EventEmitter<FilterModel>();
+  @Input() filters: FilterModel | null = null;
 
   // stores all validated facet configurations
   facetConfig: FacetConfig[] = []
@@ -63,10 +64,18 @@ export class SearchWidgetComponent implements OnInit {
       maxSearchLength: this.maxSearchLength,
     })
 
+    this.updateFilters();
+
     // get the processed and sanitized facet configuration
     this.facetConfig = this.formService.getFacetConfig();
 
     this.extractSanitizedOptions(this.formService.getOptions());
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['filters'] && this.filters) {
+      this.updateFilters();
+    }
   }
 
   /**
@@ -110,6 +119,14 @@ export class SearchWidgetComponent implements OnInit {
     return selectionsGroup;
   }
 
+  private updateFilters() {
+    if (this.searchForm && this.filters) {
+      this.searchForm.patchValue({
+        searchTerm: this.filters.searchTerm,
+        selections: this.filters.selections
+      });
+    }
+  }
 
   private scrollToError() {
     this.errorField.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
