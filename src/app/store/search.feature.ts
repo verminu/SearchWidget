@@ -8,7 +8,8 @@ export const {
   selectResults: searchResultsSelector,
   selectColumns: searchResultsColumns,
   selectError: searchErrorSelector,
-  selectSearchInProgress: searchInProgressSelector
+  selectSearchInProgress: searchInProgressSelector,
+  selectFilters: searchFiltersSelector,
 } = createFeature({
   name: 'search',
   reducer: SearchReducer,

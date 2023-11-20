@@ -1,3 +1,16 @@
+<div class="mb-3">
+  <button mat-button mat-stroked-button (click)="navigateToSearchPage()">
+    <mat-icon>arrow_back</mat-icon>
+    Back to Search
+  </button>
+</div>
+
+<mat-chip-set *ngIf="filterChips.length" class="mb-3">
+  <mat-chip *ngFor="let chip of filterChips" [disableRipple]="true">
+    <strong>{{chip.label}}:</strong> {{chip.value}}
+  </mat-chip>
+</mat-chip-set>
+
 <ng-container *ngIf="displayedColumns">
   <div class="mat-elevation-z8">
     <table mat-table [dataSource]="tableDataSource">
