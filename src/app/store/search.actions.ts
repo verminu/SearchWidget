@@ -22,8 +22,17 @@ export const mainPageActions = createActionGroup({
         columns: ResultsColumn[]
       }
     }>(),
-
   }
 })
+
+export const routeActions = createActionGroup({
+  source: 'Route',
+  events: {
+    'Navigate To Search Page': emptyProps(),
+    'Navigate To Results Page': emptyProps(),
+    'Update Route To Search': emptyProps(),
+    'Update Route To Results': emptyProps(),
+  }
+});
 
 

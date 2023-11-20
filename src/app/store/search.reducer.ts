@@ -1,8 +1,7 @@
 import {FacetsConfig, FilterModel, ResultsColumn} from "../shared/search-widget/search-widget.model";
 import {FormOptions} from "../shared/search-widget/form.service";
 import {createReducer, on} from "@ngrx/store";
-import {mainPageActions, searchPageActions} from "./search.actions";
-import {BookModel} from "../search.service";
+import {mainPageActions, routeActions, searchPageActions} from "./search.actions";
 
 export interface SearchStateInterface {
   searchParams: {
@@ -13,7 +12,8 @@ export interface SearchStateInterface {
   results: any[],
   filters: FilterModel,
   searchInProgress: boolean,
-  error: any
+  error: any,
+  page: string,
 }
 
 const initialState: SearchStateInterface = {
@@ -26,6 +26,7 @@ const initialState: SearchStateInterface = {
   filters: null,
   searchInProgress: false,
   error: null,
+  page: ''
 }
 
 export const SearchReducer = createReducer(
@@ -56,5 +57,16 @@ export const SearchReducer = createReducer(
     ...state,
     results: action.results,
     error: null
-  }))
+  })),
+
+  on(routeActions.updateRouteToSearch, (state) => ({
+    ...state,
+    page: 'search'
+  })),
+
+  on(routeActions.updateRouteToResults, (state) => ({
+    ...state,
+    page: 'results'
+  })),
+
 )

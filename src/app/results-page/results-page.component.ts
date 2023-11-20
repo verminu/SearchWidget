@@ -10,6 +10,7 @@ import {FilterModel} from "../shared/search-widget/search-widget.model";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {ActivatedRoute, Router} from "@angular/router";
+import {routeActions} from "../store/search.actions";
 
 type FilterChip = { label: string, value: any }
 
@@ -40,8 +41,6 @@ export class ResultsPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private store: Store,
-    private router: Router,
-    private route: ActivatedRoute
   ) {}
 
   ngAfterViewInit() {
@@ -71,7 +70,7 @@ export class ResultsPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   navigateToSearchPage(): void {
-    this.router.navigate(['../search'], { relativeTo: this.route });
+    this.store.dispatch(routeActions.navigateToSearchPage());
   }
 
   getColumnValue(value: any) {
