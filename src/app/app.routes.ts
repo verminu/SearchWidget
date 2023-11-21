@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import {Routes} from '@angular/router';
 import {SearchPageComponent} from "./search-page/search-page.component";
 import {ResultsPageComponent} from "./results-page/results-page.component";
 

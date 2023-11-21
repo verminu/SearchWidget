@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {
-  FacetConfig, FacetsConfig,
+  FacetConfig,
   FacetType,
   FilterModel,
 } from "./search-widget.model";
@@ -34,7 +34,7 @@ import {DataMappingService} from "./data-mapping.service";
 export class SearchWidgetComponent implements OnInit, OnChanges {
 
   // Facets configuration for the search widget.
-  @Input() facets: FacetsConfig = [];
+  @Input() facets: FacetConfig[] = [];
 
   // Initial filters (if any) to populate the form.
   @Input() filters: FilterModel | null = null;

@@ -1,44 +1,37 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {Store} from "@ngrx/store";
-import {
-  searchFiltersSelector,
-  searchInProgressSelector,
-  searchResultsColumns,
-  searchResultsSelector
-} from "../store/search.feature";
+import {searchInProgressSelector} from "../store/search.feature";
 import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 import {MatPaginator, MatPaginatorModule} from "@angular/material/paginator";
 import {Subject, takeUntil} from "rxjs";
 import {MatChipsModule} from "@angular/material/chips";
-import {FilterModel} from "../shared/search-widget/search-widget.model";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
-import {resultsPageActions, routeActions} from "../store/search.actions";
+import {routeActions} from "../store/search.actions";
+import {FilterChip, ResultsPageService, TableColumn} from "./results-page.service";
+import {BookModel} from "../search.service";
 
-type FilterChip = { label: string, value: any }
 
 @Component({
   selector: 'app-results-page',
   standalone: true,
   imports: [CommonModule, MatTableModule, MatPaginatorModule, MatChipsModule, MatButtonModule, MatIconModule],
   templateUrl: './results-page.component.html',
-  styleUrls: ['./results-page.component.scss']
+  styleUrls: ['./results-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResultsPageComponent implements OnInit, OnDestroy, AfterViewInit {
-  searchResults$ = this.store.select(searchResultsSelector);
-  displayedColumns$ = this.store.select(searchResultsColumns);
-  searchFilters$ = this.store.select(searchFiltersSelector);
-  loading$ = this.store.select(searchInProgressSelector);
 
-  tableDataSource!: MatTableDataSource<any>;
-  displayedColumns!: {
-    key: string,
-    label: string
-  }[];
+  tableDataSource!: MatTableDataSource<BookModel>;
+
+  displayedColumns!: TableColumn[];
+
   columnNames!: string[];
 
   filterChips: FilterChip[] = [];
+
+  loading$ = this.store.select(searchInProgressSelector);
 
   unsubscribe$ = new Subject<void>();
 
@@ -46,8 +39,9 @@ export class ResultsPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private store: Store,
+    private resultsService: ResultsPageService
   ) {
-    this.tableDataSource = new MatTableDataSource<any>([]);
+    this.tableDataSource = new MatTableDataSource<BookModel>([]);
   }
 
   ngAfterViewInit() {
@@ -55,26 +49,35 @@ export class ResultsPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.store.dispatch(resultsPageActions.pageLoaded());
-    });
+    this.resultsService.init();
 
-    this.searchResults$.pipe(takeUntil(this.unsubscribe$)).subscribe(results => {
-      this.tableDataSource.data = results || [];
-    })
+    this.resultsService.searchResults$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(results => {
+        this.tableDataSource.data = results;
+      })
 
-    this.displayedColumns$.pipe(takeUntil(this.unsubscribe$)).subscribe(columns => {
-      this.displayedColumns = Array.from(columns.entries())
-        .map(entry => ({key: entry[0], label: entry[1]}));
+    this.resultsService.displayedColumns$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(columns => {
+        this.displayedColumns = columns
 
-      this.columnNames = Array.from(columns.keys());
-    })
+        if (!this.displayedColumns.length) {
+          console.warn('Your table has no columns defined.');
+        }
+      })
 
-    this.searchFilters$.pipe(takeUntil(this.unsubscribe$)).subscribe(filters => {
-      this.filterChips = this.prepareFilterChips(filters);
-    });
+    this.resultsService.columnNames$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(columnNames => {
+        this.columnNames = columnNames;
+      })
 
-
+    this.resultsService.filterChips$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(filterChips => {
+        this.filterChips = filterChips
+      });
   }
 
   ngOnDestroy() {
@@ -86,44 +89,8 @@ export class ResultsPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.store.dispatch(routeActions.navigateToSearchPage());
   }
 
-  getColumnValue(value: any) {
-    if (typeof value === 'boolean') {
-      return value ? 'Yes' : 'No'
-    }
-
-    return value;
+  getDisplayValue(value: any) {
+    return this.resultsService.getDisplayValue(value);
   }
 
-  private prepareFilterChips(filters: FilterModel): FilterChip[] {
-    const chips: FilterChip[] = [];
-
-    if (!filters) {
-      return chips;
-    }
-
-    // Add search term chip
-    if (filters.searchTerm) {
-      chips.push({ label: "Search", value: filters.searchTerm });
-    }
-
-    // Add chips for each active filters
-    this.columnNames.forEach(column => {
-      if (filters.selections && filters.selections[column] !== undefined) {
-        const columnLabel = this.displayedColumns.find(c => c.key === column)?.label || column;
-        const filterValue = filters.selections[column];
-        let value: string = 'N/A';
-
-        if (typeof filterValue === 'boolean') {
-          value = filterValue ? 'Yes' : 'No';
-        }
-        else if (Array.isArray(filterValue)) {
-          value = filterValue.join(', ');
-        }
-
-        chips.push({ label: columnLabel, value: value });
-      }
-    });
-
-    return chips;
-  }
 }

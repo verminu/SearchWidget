@@ -1,11 +1,11 @@
-import {FacetsConfig, FilterModel, ResultsColumn} from "../shared/search-widget/search-widget.model";
+import {FacetConfig, FilterModel, ResultsColumn} from "../shared/search-widget/search-widget.model";
 import {FormOptions} from "../shared/search-widget/form.service";
 import {createReducer, on} from "@ngrx/store";
 import {mainPageActions, routeActions, searchPageActions} from "./search.actions";
 
 export interface SearchStateInterface {
   searchParams: {
-    config: FacetsConfig,
+    config: FacetConfig[],
     options?: FormOptions,
     columns: ResultsColumn[],
   },

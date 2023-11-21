@@ -1,8 +1,9 @@
-import {FacetsConfig, FacetType, ResultsColumn} from "./shared/search-widget/search-widget.model";
+import {FacetConfig, FacetType, ResultsColumn} from "./shared/search-widget/search-widget.model";
 import {FormOptions} from "./shared/search-widget/form.service";
+import {BookModel} from "./search.service";
 
 const bookGenres = ['Science Fiction', 'Fantasy', 'Adventure', 'Romance', 'Mystery', 'Historical Fiction', 'Drama', 'Philosophy', 'Mythology'];
-const bookLanguages = ['English', 'Chinese', 'French', 'Spanish', 'Arabic', 'Italian', 'Japanese', 'Korean', 'Swedish', 'German', 'Russian', 'Greek', 'Swahili', 'Portuguese'];
+const bookLanguages = ['English', 'Chinese', 'French', 'Spanish', 'Arabic', 'Italian', 'Japanese', 'Korean', 'Swedish', 'German', 'Greek', 'Swahili', 'Portuguese'];
 const bookTypes = ['Hardcover', 'Anthology', 'Illustrated Edition', 'Paperback', 'First Edition', 'Graphic Novel', 'Biography', 'Novella', 'Textbook', 'Play', 'Encyclopedia', 'Short Story Collection', 'Memoir', 'Travel Guide', 'Poetry Collection', 'Journal', 'Academic Paper', 'Detective Novel', 'Novel', 'Ebook', 'Historical Novel', 'Travelogue', 'Manga', 'Collection'];
 
 export const resultsColumns: ResultsColumn[] = [
@@ -20,7 +21,10 @@ export const searchWidgetParams: FormOptions = {
   maxSearchLength: 20
 }
 
-export const searchWidgetConfig: FacetsConfig = [
+/**
+ * This is the list of the facets that will be displayed in the search widget.
+ */
+export const searchWidgetConfig: FacetConfig<BookModel>[] = [
   {
     key: 'genre',
     label: 'Genre',

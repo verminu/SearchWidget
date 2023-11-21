@@ -7,14 +7,12 @@ export enum FacetType {
   Checkboxes = 'checkboxes',
 }
 
-export type FacetConfig = {
-  type: FacetType; // specify the type of the widget to be displayed
-  label: string; // the label of the widget
-  key: string; // each widget has a unique key, so it can be identified
-  data?: string[] // additional data needed for displaying a facet
+export type FacetConfig<DataModel = Record<string, any>> = {
+  type: FacetType;
+  label: string;
+  key: keyof DataModel;
+  data?: string[]
 }
-
-export type FacetsConfig = FacetConfig[]
 
 /**
  * Define the interfaces for the selections in the form

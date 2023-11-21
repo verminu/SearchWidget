@@ -1,5 +1,5 @@
 import {createActionGroup, emptyProps, props} from "@ngrx/store";
-import {FacetsConfig, FilterModel, ResultsColumn} from "../shared/search-widget/search-widget.model";
+import {FacetConfig, FilterModel, ResultsColumn} from "../shared/search-widget/search-widget.model";
 import {FormOptions} from "../shared/search-widget/form.service";
 
 export const searchPageActions = createActionGroup({
@@ -24,7 +24,7 @@ export const mainPageActions = createActionGroup({
   events: {
     'Set Search Params': props<{
       searchParams: {
-        config: FacetsConfig,
+        config: FacetConfig<any>[],
         options?: FormOptions,
         columns: ResultsColumn[]
       }

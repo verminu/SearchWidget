@@ -23,7 +23,9 @@ export type FormOptions = {
   maxSearchLength?: number
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class FormService {
   private readonly MAX_SEARCH_LENGTH_LIMIT = 50;
   private readonly MIN_SEARCH_LENGTH = 3;

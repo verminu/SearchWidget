@@ -19,7 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideState(searchFeatureKey, searchReducer),
     provideEffects(searchEffects),
     provideStoreDevtools({
-      maxAge: 20,
+      maxAge: 30,
       logOnly: !isDevMode(),
       autoPause: true,
       trace: true,

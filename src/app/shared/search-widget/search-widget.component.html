@@ -6,10 +6,18 @@
       <mat-form-field appearance="fill">
         <mat-label>Search</mat-label>
 
-        <input #errorField matInput formControlName="searchTerm" (input)="updateSearchTerm($event)">
+        <input #errorField
+               matInput
+               formControlName="searchTerm"
+               (input)="updateSearchTerm($event)">
 
-        <mat-hint align="start">Enter {{minSearchLengthOption}} to {{maxSearchLengthOption}} characters</mat-hint>
-        <mat-error *ngIf="searchForm.get('searchTerm')!.hasError('searchInvalid')">
+        <mat-hint id="search-hint"
+                  align="start">
+          Enter {{minSearchLengthOption}} to {{maxSearchLengthOption}} characters
+        </mat-hint>
+
+        <mat-error id="search-error"
+                   *ngIf="searchForm.get('searchTerm')!.hasError('searchInvalid')">
           Search term must be between {{minSearchLengthOption}} and {{maxSearchLengthOption}} characters
         </mat-error>
 
@@ -17,15 +25,18 @@
                 matSuffix
                 type="button"
                 *ngIf="searchTerm.trim()"
-                (click)="searchForm.get('searchTerm')!.setValue('')">
+                (click)="searchForm.get('searchTerm')!.setValue('')"
+                aria-label="Clear search term">
           <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
     </div>
 
-    <div formGroupName="selections" class="facet-layout">
+    <div formGroupName="selections"
+         class="facet-layout">
 
-      <div *ngFor="let facet of facetConfig" [className]="'facet-container facet-container--'+facet.type">
+      <div *ngFor="let facet of facetConfig"
+           [className]="'facet-container facet-container--'+facet.type">
 
         <div class="facet-label">
           <label>{{ facet.label }}</label>
@@ -36,7 +47,8 @@
 
             <ng-container *ngSwitchCase="FacetType.YesNo">
               <div class="form-field--radio">
-                <mat-radio-group [formControlName]="facet.key" class="radio-group-container">
+                <mat-radio-group [formControlName]="facet.key"
+                                 class="radio-group-container">
                   <mat-radio-button [value]="true">Yes</mat-radio-button>
                   <mat-radio-button [value]="false">No</mat-radio-button>
                   <mat-radio-button [value]="null">Irrelevant</mat-radio-button>
@@ -48,7 +60,8 @@
               <div class="form-field--select">
                 <mat-form-field subscriptSizing="dynamic">
                   <mat-label>Select</mat-label>
-                  <mat-select [formControlName]="facet.key" multiple>
+                  <mat-select [formControlName]="facet.key"
+                              multiple>
                     <mat-option *ngFor="let option of facet.data"
                                 [value]="option">{{option}}</mat-option>
                   </mat-select>
@@ -57,7 +70,8 @@
             </ng-container>
 
             <ng-container *ngSwitchCase="FacetType.Checkboxes">
-              <div [formArrayName]="facet.key" class="form-field--checkboxes">
+              <div [formArrayName]="facet.key"
+                   class="form-field--checkboxes">
                 <div class="w-100" *ngFor="let option of facet.data; let i = index;">
                   <mat-checkbox [formControlName]="i">{{option}}</mat-checkbox>
                 </div>
@@ -73,11 +87,11 @@
   </div>
 
   <div class="d-flex justify-content-end mt-4">
-    <button mat-button class="me-3" type="button" (click)="resetForm()">Reset</button>
-    <button mat-button mat-raised-button color="primary" type="submit">Search</button>
+    <button mat-button class="me-3" type="button" (click)="resetForm()" aria-label="Reset search form">Reset</button>
+    <button mat-button mat-raised-button color="primary" type="submit" aria-label="Submit search">Search</button>
   </div>
 
-  <mat-error *ngIf="searchForm.invalid" class="error-message">
+  <mat-error *ngIf="searchForm.invalid" class="error-message" aria-live="polite">
     Please correct the errors before searching.
   </mat-error>
 </form>

@@ -5,7 +5,9 @@ interface FacetMappingStrategy {
   mapValue(facetValue: any, facetConfig: FacetConfig): FacetSelection | undefined;
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DataMappingService {
   private facetMappingStrategies: Map<FacetType, FacetMappingStrategy>;
 
